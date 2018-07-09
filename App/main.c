@@ -1,15 +1,15 @@
 /******************** (C) COPYRIGHT 2018 Team **************************
- * �ļ���  ��main.c
- * ����    ��        
- * ʵ��ƽ̨��STM32F103C8T6
- * ��汾  ��ST3.5.0 
- * ����    ��Travis 
- * 2080620 : Infrared_Recv.c line271,line277,����2��ָ����ڻָ��������úͻض�����
- * ����    ��2018/05/04
+ * 文件名  ：main.c
+ * 描述    ：        
+ * 实验平台：STM32F103C8T6
+ * 库版本  ：ST3.5.0 
+ * 作者    ：Travis 
+ * 2080620 : Infrared_Recv.c line271,line277,增加2条指令，用于恢复出厂设置和回读参数
+ * 日期    ：2018/05/04
 **********************************************************************************/
 #include "UserApp.h"
 
-#define MAIN_DEBUG_INFO 0x01  //�������ڴ�ӡ������Ϣ���������Ҫ�����θ���
+#define MAIN_DEBUG_INFO 0x01  //开启串口打印调试信息，如果不需要，屏蔽该行
 
 extern struct ConfigData_Type ConfigData;
 extern uint8_t Ir_SendBuff[255];
@@ -23,17 +23,14 @@ extern volatile u16 BoostPwm_Duty;
 extern u16 Working_Current;  
 uint16_t LED_DaleyTime = 1000;
 
-
-
-
 /*******************************************************************
 *main()
-*�������ܣ�
-*�����������
-*���ز�������
-*��д���ߣ�
-*��дʱ�䣺
-*���˵����
+*函数功能：
+*输入参数：无
+*返回参数：无
+*编写作者：
+*编写时间：
+*相关说明：
 ********************************************************************/
 int main(void)
 {
@@ -52,7 +49,7 @@ int main(void)
   DISABLE_DIRECT_CHARGE;
   
 	ConfigData.Contorller_Mode = MODE_POWERONTEST;
-	ModeDelay = 60000;     //����1���Ӳ��ԣ�1 * 60 * 1000
+	ModeDelay = 60000;     //开机1分钟测试，1 * 60 * 1000
   Boost_Working = true;
 	
   BoostPwm_Duty = 50;
@@ -61,7 +58,7 @@ int main(void)
 	
 //	while(1)
 //	{
-//		//LED״ָ̬ʾ��ͨ���趨��ͬ����˸Ƶ�ʱ�ʾ��ͬ��״̬
+//		//LED状态指示，通过设定不同的闪烁频率表示不同的状态
 //    if(TimingDelay == 0x00)
 //		{
 //      FLIP_LED1;
@@ -75,39 +72,39 @@ int main(void)
 	{
 		Is_Infrared_Recv();
     		
-    //����1���Ӳ���
+    //开机1分钟测试
     if(ConfigData.Contorller_Mode == MODE_POWERONTEST)
 		{
 		  WorkInPowerOnTest();
 		}
-		//����״̬����Ҫң��������
-    else if(ConfigData.Contorller_Mode == MODE_STANDBY)      //����
+		//休眠状态，需要遥控器开启
+    else if(ConfigData.Contorller_Mode == MODE_STANDBY)      //休眠
 		{
       WorkInStandby();	
 		}
-    //�������
+    //白天待机
 		else if(ConfigData.Contorller_Mode == MODE_IDLE)          
 		{
 		  WorkInIdleMode();		
 		}
-		//����ӳ�
-    else if(ConfigData.Contorller_Mode == MODE_LIGHTCTL)   //����ӳ�
+		//光控延迟
+    else if(ConfigData.Contorller_Mode == MODE_LIGHTCTL)   //光控延迟
 		{
 		  WorkInLightControlDelay();	
 		}
 		else
 		{			
-			//��Ӧʱ���1
+			//感应时间段1
       if(ConfigData.Contorller_Mode == MODE_TIMESLOT1)
 			{
 				WorkInTimeSlot1();				  				
 			}
-      //��Ӧʱ���2
+      //感应时间段2
 			else if(ConfigData.Contorller_Mode == MODE_TIMESLOT2)
 			{
 				WorkInTimeSlot2();
 			}
-      //��Ӧʱ���3
+      //感应时间段3
 			else if(ConfigData.Contorller_Mode == MODE_TIMESLOT3)
 			{
 				WorkInTimeSlot3();		
@@ -117,7 +114,7 @@ int main(void)
 			Is_SomeBody_Detection();
 		}
 		
-		//LED״ָ̬ʾ��ͨ���趨��ͬ����˸Ƶ�ʱ�ʾ��ͬ��״̬
+		//LED状态指示，通过设定不同的闪烁频率表示不同的状态
     if(TimingDelay == 0x00)
 		{
       FLIP_LED1;
